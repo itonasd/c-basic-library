@@ -38,6 +38,8 @@ array filter(array dest, _callback_1arg callback) {
     dest->length -= dest->length - length;
     dest->alloc.length += dest->length - length;
 
+    free(extract);
+
     return dest;
 }
 

@@ -24,6 +24,22 @@ void arr_free(array src) {
     free(src);
 }
 
+void item_free(items src) {
+    if (!src) return;
+
+    free(src->value);
+    free(src);
+}
+
+void res_free(result src) {
+    if (!src) return;
+
+    for (uint64 i = 0; i < src->length; i++)
+        free(src->item[i].value);
+    free(src->item);
+    free(src);
+}
+
 void arr_log(array src) {
     array buffer = src;
     raw byte = (raw)buffer->buffer;

@@ -29,7 +29,11 @@ array filtered(array src, _callback_1arg callback) {
     dest->length = length;
     dest->alloc.length = length;
     raw temp = (raw) realloc(dsts, length * size);
-    if (!temp) return 0;
+    if (!temp) {
+        free(dsts);
+        return 0;
+    }
+
     dest->buffer = temp;
 
     return dest;
@@ -87,21 +91,85 @@ array reduced(array src, _callback_2arg callback, any initial) {
     return dest;
 }
 
-result find(array src, _callback_1arg callback) {
+result findAll(array src, _callback_1arg callback) {
+    if (!src || !callback) return 0;
+
     result ret = (result) malloc(sizeof(res));
-    ret->value = (raw) malloc(src->size);
-    ret->index = -1;
-    ret->pointer = 0;
-    memset(ret->value, 0xFF, src->size);
-    if (!src || !callback) return ret;
+    if (!ret) return 0;
+
+    ret->length = src->length;
+    ret->item = (items) malloc(sizeof(item) * src->length);
+    if (!ret->item) {
+        free(ret->item);
+        free(ret);
+        return 0;
+    }
+
+    uint64 size = src->size;
+    uint64 retPointer = 0;
+    raw srcs = src->buffer;
+
+    for (uint64 i = 0; i < src->length; i++) {
+        if (callback(srcs + (i * size))) {
+            ret->item[retPointer].pointer = srcs + (i * size);
+
+            ret->item[retPointer].value = (raw) malloc(size);
+            if (!ret->item[retPointer].value) {
+                for (uint64 i = 0; i < retPointer; i++)
+                    free(ret->item[i].value);
+                free(ret->item);
+                free(ret);
+                return 0;
+            }
+
+            memcpy(ret->item[retPointer].value, srcs + (i * size), size);
+
+            ret->item[retPointer].index = i;
+            retPointer++;
+        }
+    }
+
+    if (!retPointer) {
+        free(ret->item);
+        ret->item = 0;
+        ret->length = 0;
+        return ret;
+    }
+
+    items new_item = (items) realloc(ret->item, sizeof(item) * retPointer);
+
+    if (!new_item) {
+        for (uint64 i = 0; i < retPointer; i++)
+            free(ret->item[i].value);
+        free(ret->item);
+        free(ret);
+        return 0;
+    }
+
+    ret->item = new_item;
+    ret->length = retPointer;
+
+    return ret;
+}
+
+items find(array src, _callback_1arg callback) {
+    if (!src || !callback) return 0;
+    items ret = (items) malloc(sizeof(item));
 
     uint64 size = src->size;
     raw srcs = src->buffer;
 
     for (uint64 i = 0; i < src->length; i++) {
         if (callback(srcs + (i * size))) {
-            ret->pointer = src->buffer + (i * size);
-            memcpy(ret->value, src->buffer + (i * size), size);
+            ret->pointer = srcs + (i * size);
+
+            ret->value = (raw) malloc(size);
+            if (!ret->value) {
+                free(ret);
+                return 0;
+            }
+            memcpy(ret->value, srcs + (i * size), size);
+
             ret->index = i;
             break;
         }
@@ -119,6 +187,7 @@ array merged(array src_a, array src_b) {
     dest->length = src_a->length + src_b->length;
     dest->alloc.length = src_a->length + src_b->length;
     dest->buffer = (raw) malloc(src_a->size * dest->length);
+
     if (!dest->buffer) {
         free(dest);
         return 0;

@@ -25,9 +25,32 @@ typedef unsigned char* raw;
 typedef callback (*_callback_1arg)(any);
 typedef callback (*_callback_2arg)(any, any);
 
-#define to(type, value) (*(type*)(value))
+// macros
+
 #define true (void*)1
 #define false (void*)0
+
+#define to(type, value) (*(type*)(value))
+#define boolean(condition) ((condition) ? true : false)
+#define get(type, src, index) (to(type, gather(src, index, index)))
+
+#define push(type, dest, value) do {                \
+    type a = value;                                 \
+    write(dest, dest->length, dest->length, &a);    \
+} while (0)
+
+#define shift(type, dest, value) do {               \
+    type a = value;                                 \
+    insert(dest, 0, 0, &a);                         \
+} while (0)
+
+#define pop(dest) do {                              \
+    erase(dest, dest->length - 1, dest->length - 1);\
+} while (0)
+
+#define unshift(dest) do {                          \
+    erase(dest, 0, 0);                              \
+} while (0)
 
 // 40ULL
 typedef struct _arr {
@@ -42,19 +65,34 @@ typedef struct _arr {
 
 } arr; 
 
-typedef struct _res {
+typedef struct _item {
     raw pointer;
     any value;
     uint64 index;
+} item;
+
+typedef item* items;
+
+typedef struct _res {
+    items item;
+    uint64 length;
+
 } res;
 
 typedef arr* array;
 typedef res* result;
 
-void arr_config(array dest, uint64 size);
-
 array arr_init(uint64 size);
 
+void arr_config(array dest, uint64 size);
+
+void arr_log(array src);
+
+void arr_free(array src);
+
+void item_free(items src);
+
+void res_free(result src);
 
 array filtered(array src, _callback_1arg callback);
 array filter(array dest, _callback_1arg callback);
@@ -72,7 +110,7 @@ array reversed(array src);
 array reverse(array dest);
 
 
-result find(array src, _callback_1arg callback);
+any gather(array src, uint64 start, uint64 end);
 
 array write(array dest, uint64 start, uint64 end, any src);
 
@@ -80,11 +118,10 @@ array insert(array dest, uint64 start, uint64 end, any src);
 
 array erase(array dest, uint64 start, uint64 end);
 
+result findAll(array src, _callback_1arg callback);
+items find(array src, _callback_1arg callback);
+
 array flush(array dest, double percentage);
-
-void arr_log(array src);
-
-void arr_free(array src);
 
 #ifdef SORT_UNAVALIABLE
 

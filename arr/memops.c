@@ -170,3 +170,8 @@ array flush(array dest, double percentage) {
 
     return dest;
 }
+
+any gather(array src, uint64 start, uint64 end) {
+    if (!src || start >= src->length || end >= src->length || start > end) return 0;
+    return src->buffer + ((start * src->size) + ((end - start) * src->size));
+}

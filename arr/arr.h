@@ -51,27 +51,40 @@ typedef struct _res {
 typedef arr* array;
 typedef res* result;
 
-void config(array dest, uint64 size);
+void arr_config(array dest, uint64 size);
 
-array init(uint64 size);
+array arr_init(uint64 size);
 
-array filter(array src, _callback_1arg callback);
 
-array map(array src, _callback_1arg callback);
+array filtered(array src, _callback_1arg callback);
+array filter(array dest, _callback_1arg callback);
 
-array reduce(array src, _callback_2arg callback, any initial);
+array mapped(array src, _callback_1arg callback);
+array map(array dest, _callback_1arg callback);
 
-array reverse(array src);
+array reduced(array src, _callback_2arg callback, any initial);
+array reduce(array dest, _callback_2arg callback, any initial);
+
+array merged(array src_a, array src_b);
+array merge(array dest, array src);
+
+array reversed(array src);
+array reverse(array dest);
 
 result find(array src, _callback_1arg callback);
 
-void write(array dest, uint64 start, uint64 end, any src);
 
-void insert(array dest, uint64 start, uint64 end, any src);
+array write(array dest, uint64 start, uint64 end, any src);
 
-void erase(array dest, uint64 start, uint64 end);
+array insert(array dest, uint64 start, uint64 end, any src);
 
-void flush(array dest, double percentage);
+array erase(array dest, uint64 start, uint64 end);
+
+array flush(array dest, double percentage);
+
+void arr_log(array src);
+
+void arr_free(array src);
 
 #ifdef SORT_UNAVALIABLE
 
@@ -82,37 +95,3 @@ void flush(array dest, double percentage);
 #define SORT_IS_NOT_INCLUDED
 #endif
 #endif
-
-/*
-
-void log(arr *buffer) {
-    raw byte = (raw)buffer->buffer;
-    int *_int = (int *)buffer->buffer;
-    
-    printf("\n    ARRAY LOG\n\n");
-    printf("    initialized region\n");
-    for (int i = 0; i < buffer->length; i++) {
-        printf("    cell %2d: [ ", i);
-        for (int j = 0; j < buffer->size; j++) {
-            printf("0x%02x ", byte[i * buffer->size + j]);
-        }
-        printf("]  %d\n", _int[i]);
-    }
-    printf("\n    pre allocated region\n");
-    if (buffer->alloc.length == buffer->length) printf("    none\n");
-    for (int i = buffer->length; i < buffer->alloc.length; i++) {
-        printf("    cell %2d: [ ", i);
-        for (int j = 0; j < buffer->size; j++) {
-            printf("0x%02x ", byte[i * buffer->size + j]);
-        }
-        printf("]  %d\n", _int[i]);
-    }
-
-    printf("\n");
-    printf("    size: %ld, length: %ld, total: %ld, segment: ", buffer->size, buffer->length, buffer->alloc.length);
-    printf("\n");
-    printf("    buffer start address : %p : %d\n", buffer->buffer, 0);
-    printf("    buffer end address   : %p : %ld\n\n", buffer->buffer + (buffer->size * buffer->alloc.length) - 1, (buffer->size * buffer->alloc.length) - 1);
-}
-    
-*/

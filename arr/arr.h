@@ -71,8 +71,8 @@ array merge(array dest, array src);
 array reversed(array src);
 array reverse(array dest);
 
-result find(array src, _callback_1arg callback);
 
+result find(array src, _callback_1arg callback);
 
 array write(array dest, uint64 start, uint64 end, any src);
 

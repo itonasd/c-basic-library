@@ -40,7 +40,7 @@ void res_free(result src) {
     free(src);
 }
 
-void arr_log(array src) {
+array arr_log(array src) {
     array buffer = src;
     raw byte = (raw)buffer->buffer;
     int *_int = (int *)buffer->buffer;
@@ -65,8 +65,10 @@ void arr_log(array src) {
     }
 
     printf("\n");
-    printf("    size: %ld, length: %ld, total: %ld, segment: ", buffer->size, buffer->length, buffer->alloc.length);
+    printf("    size: %lld, length: %lld, total: %lld, segment: ", buffer->size, buffer->length, buffer->alloc.length);
     printf("\n");
     printf("    buffer start address : %p : %d\n", buffer->buffer, 0);
-    printf("    buffer end address   : %p : %ld\n\n", buffer->buffer + (buffer->size * buffer->alloc.length) - 1, (buffer->size * buffer->alloc.length) - 1);
+    printf("    buffer end address   : %p : %lld\n\n", buffer->buffer + (buffer->size * buffer->alloc.length) - 1, (buffer->size * buffer->alloc.length) - 1);
+
+    return src;
 }

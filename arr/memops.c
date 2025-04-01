@@ -111,6 +111,42 @@ array insert(
     return dest;
 }
 
+array fill(array dest, uint64 start, uint64 end, any val) {
+    if (!dest || !val) return 0;
+
+    if (start > end) {
+        start ^= end;
+        end ^= start;
+        start ^= end;
+    }
+
+    uint64 size = dest->size;
+    uint64 alloc_length = dest->alloc.length;
+    uint64 alloc_fac = dest->alloc.factor;
+    raw dst = dest->buffer;
+
+    if (dst == 0 || end >= alloc_length) {
+        uint64 new_alloc_length = end + 1 + alloc_fac;
+        raw new_dst = (raw) realloc(dst, new_alloc_length * size);
+        if (!new_dst) return 0;
+
+        dest->buffer = new_dst;
+        dst = new_dst;
+        memset(dst + alloc_length * size, 0xFF, (new_alloc_length - alloc_length) * size);
+        dest->alloc.length = new_alloc_length;
+    }
+
+    for (uint64 i = start; i < end + 1; i++)
+        memcpy(
+            dst + (i * size),
+            val,
+            size
+        );
+
+    dest->length = (dest->length > end + 1) ? dest->length : end + 1;
+    return dest;
+}
+
 array erase(array dest, uint64 start, uint64 end) {
     if (!dest || start >= dest->length || end >= dest->length) return 0;
     
@@ -169,9 +205,4 @@ array flush(array dest, double percentage) {
     }
 
     return dest;
-}
-
-any gather(array src, uint64 start, uint64 end) {
-    if (!src || start >= src->length || end >= src->length || start > end) return 0;
-    return src->buffer + ((start * src->size) + ((end - start) * src->size));
 }

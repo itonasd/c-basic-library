@@ -232,3 +232,38 @@ array reversed(array src) {
 
     return dest;
 }
+
+array extract(array src, uint64 start, uint64 end) {
+    if (!src || start >= src->length || end >= src->length) return 0;
+    uint8 swap = 0;
+    if (start > end) {
+        swap = 1;
+        start ^= end;
+        end ^= start;
+        start ^= end;
+    }
+
+    array dest = arr_init(src->size);
+    if (!dest) return 0;
+
+    dest->length = end - start + 1;
+    dest->alloc.length = end - start + 1;
+    dest->buffer = (raw) malloc(src->size * src->length);
+    if (!dest->buffer) {
+        free(dest);
+        return 0;
+    }
+
+    memcpy(
+        dest->buffer,
+        src->buffer + (start * src->size),
+        (end - start + 1) * src->size
+    );
+
+    return dest;
+}
+
+any gather(array src, uint64 index) {
+    if (!src || index >= src->length) return 0;
+    return src->buffer + (index * src->size);
+}

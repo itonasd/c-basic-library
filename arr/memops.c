@@ -206,3 +206,7 @@ array flush(array dest, double percentage) {
 
     return dest;
 }
+
+array deref(array src, uint64 index) {
+    return (array)((uint64*)src->buffer)[index];
+}

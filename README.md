@@ -1,6 +1,6 @@
 it literally can store any data type lol.    
 including itself, any structs if cast properly.   
-not type safesince i just use void pointer everywhere xd.    
+not type safe since i use void pointer everywhere xd.    
 
 ## Nested Array Guide
 ~~~

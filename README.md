@@ -12,7 +12,8 @@ type unsafe
     push(array, l2, stuff);                   |  pushes stuff array into l2 array
     push(array, l3, l2);                      |  pushes l2 array array into l3 array
                                               |
-    clog_array(int, deref(deref(l3, 0), 0));  |  dereference from l3 array and casts to int, output: 69420    
+    clog_array(int, deref(deref(l3, 0), 0));  |  dereference from l3 array, output: 69420
+    equivant to: arr[i][j]    
     
 ~~~
 Note: it copies references, not the actual data.    
